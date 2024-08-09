@@ -3,9 +3,6 @@ import numpy as np
 from tqdm import tqdm
 import torch.nn as nn
 
-# https://github.com/VinAIResearch/DSW
-# https://github.com/koshian2/swd-pytorch
-
 def swd_batch(vectors1, vectors2, n_repeat_projection=512, proj_per_repeat=16, device="cuda" , random_seed=42):
     assert vectors1.size() == vectors2.size()
     assert vectors1.ndim == 3 and vectors2.ndim == 3
