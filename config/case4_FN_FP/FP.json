@@ -1,0 +1,23 @@
+{   
+    "graph_builder" :{
+        "apply_gene_similarity" : false,
+        "apply_anomaly_severity_weight" : true ,
+        "data_path" : "../data/CaseStudy/case4.h5ad",
+        "cell_type_column_name" : "case2-truth-label",
+        "cluster_column_name" : "case2-FP",
+        "num_neighbors" : 3,
+        "severity_levels":[
+            {"name" : "Normal" , "severity_level" : 1},
+            {"name" : "Anomaly" , "severity_level" : 2}
+        ]
+},
+
+    "graph_analysis" :{
+        "sample_times" : 10
+    },
+
+    "kernel_parameters":{
+        "sigma" : 1
+    }
+
+}

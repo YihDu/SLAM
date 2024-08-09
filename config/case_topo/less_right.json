@@ -1,0 +1,19 @@
+{   
+    "graph_builder" :{
+        "apply_gene_similarity" : false,
+        "apply_anomaly_severity_weight" : false ,
+        "data_path" : "../data/CaseStudy/new/topo.h5ad",
+        "cell_type_column_name" : "truth_label",
+        "cluster_column_name" : "less_right_label",
+        "num_neighbors" : 3
+},
+
+    "graph_analysis" :{
+        "sample_times" : 10
+    },
+
+    "kernel_parameters":{
+        "sigma" : 0.4
+    }
+
+}
