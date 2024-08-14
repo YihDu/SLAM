@@ -16,7 +16,6 @@ def SLAM(config_path):
     sigma = config['kernel_parameters']['sigma']
     SLAM_score = mmd_calculation.compute_mmd(sample_sets_truth,sample_sets_pred,kernel_module = mmd_calculation.GaussianEMDKernel(sigma=sigma).to('cuda'))
     print("SLAM :" , SLAM_score)
-    print('----------------------------------------------------')
     return SLAM_score
     
 if __name__ == "__main__":
