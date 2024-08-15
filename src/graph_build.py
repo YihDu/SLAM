@@ -3,9 +3,12 @@ import pandas as pd
 import numpy as np
 import anndata as ad
 from sklearn.neighbors import NearestNeighbors
-from .weight_function import calculate_distance_weight , calculate_anomaly_weight , calculate_gene_similarity
+from .weight_function import  calculate_anomaly_weight , calculate_gene_similarity
 
 class DataHandler:
+    """
+    Handle the data loading and preprocessing
+    """
     def __init__(self,file_path):
         self.file_path = file_path
         self.adata = None
@@ -15,6 +18,9 @@ class DataHandler:
         return self.adata
 
 class GraphBuilder:
+    """
+    Builds graphs from data and applies weights based on configuration.
+    """
     def __init__(self , config):
         self.config = config
         self.data_handler = DataHandler(self.config['graph_builder']['data_path'])
@@ -22,13 +28,14 @@ class GraphBuilder:
         self.pred_G = nx.Graph()
 
     def build_graph(self , coordinate_data , label_data):
+        """
+        Build a graph from the given coordinate data and label data.                
+        """
         graph = nx.Graph()
         pos = {}
-        distances = {}
         for i, (index, row) in enumerate(coordinate_data.iterrows()):
             pos[i] = (row['x'], row['y'])
-            distances[i] = row['x']
-            graph.add_node(i, pos=pos[i], group=label_data.iloc[i] , distance=distances[i])
+            graph.add_node(i, pos=pos[i], group=label_data.iloc[i])
         
         pos_array = np.array(list(pos.values()))
         num_nbrs = self.config['graph_builder']['num_neighbors'] + 1
@@ -36,13 +43,15 @@ class GraphBuilder:
         nbrs.fit(pos_array)
         _ , indices = nbrs.kneighbors(pos_array)
         
-        # build KNN graph
         for i , neighbors in enumerate(indices):
             for n in neighbors[1:]:
                 graph.add_edge(i , n)
         return graph  
     
     def copy_weights(self , truth_graph, pred_graph):
+        """
+        Copy weights from truth graph to prediction graph.
+        """
         for u, v in truth_graph.edges():
             if pred_graph.has_edge(u, v):
                 if 'gene_similarity_weight' in truth_graph[u][v]:
@@ -53,6 +62,9 @@ class GraphBuilder:
                     pred_graph[u][v]['distance_weight'] = truth_graph[u][v]['distance_weight']
 
     def process_graph(self):
+        """
+        Process data to build graphs and apply weights based on configuration.
+        """
         adata = self.data_handler.load_data()
         coordinate_data  = pd.DataFrame({
             'x' : adata.obsm['spatial'][: , 0],
@@ -62,20 +74,15 @@ class GraphBuilder:
         cluster_label = adata.obs[self.config['graph_builder']['cluster_column_name']]
         self.truth_G = self.build_graph(coordinate_data , truth_label)
         self.pred_G = self.build_graph(coordinate_data , cluster_label)
-        
-        if self.config['graph_builder'].get('apply_distance_weight' , False):
-            print("Using distance weight for SGD!")
-            print("-------------------------------")
-            x = self.config['graph_builder']['region_x_coords']
-            calculate_distance_weight(self.truth_G , x)
+    
         
         if self.config['graph_builder'].get('apply_gene_similarity' , False):
-            print("Using gene similarity weight for SGD!")
+            print("Using gene similarity weight for SLAM!")
             print("-------------------------------")
             calculate_gene_similarity(self.truth_G, anndata = adata , is_preprocessed = True)
             
         if self.config['graph_builder'].get('apply_anomaly_severity_weight' , False):
-            print("Using anomaly severity weight for SGD!")
+            print("Using anomaly severity weight for SLAM!")
             print("-------------------------------")
             calculate_anomaly_weight(self.truth_G , self.config['graph_builder']['severity_levels'])
             

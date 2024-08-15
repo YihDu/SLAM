@@ -18,7 +18,6 @@ def compute_clustering_metrics(config):
     adata = load_adata(config['graph_builder']['data_path'])
     truth_labels = adata.obs[config['graph_builder']['cell_type_column_name']]    
     cluster_labels = adata.obs[config['graph_builder']['cluster_column_name']]
-    # cluster_labels_origin = adata.obs[config['graph_builder']['cluster_column_name_origin']]
     coords = adata.obsm['spatial']
     
     # External evaluation measures
