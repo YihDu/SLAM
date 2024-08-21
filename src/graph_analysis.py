@@ -14,6 +14,7 @@ class GraphAnalyzer:
         for i in range(sample_times):
             sampled = kde.sample(num_samples ,random_state=random_seed)
             sampled = np.clip(sampled, 0, 1)   
+            # smapled = np.clip(sampled, 0, 2) 
             samples_set.append(sampled) 
         return samples_set
     
